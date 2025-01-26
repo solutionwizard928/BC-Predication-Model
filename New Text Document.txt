@@ -1,0 +1,80 @@
+# pip install scikit-learn pandas joblib
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error
+from joblib import dump, load
+
+# Step 1: Load Dataset
+def load_dataset(file_path):
+    try:
+        data = pd.read_csv(file_path)
+        return data
+    except Exception as e:
+        print(f"Error loading dataset: {e}")
+        return None
+
+# Step 2: Train the Model
+def train_model(data, feature_columns, target_columns, model_path="next_numbers_model.joblib"):
+    # Split features and targets
+    X = data[feature_columns]
+    y = data[target_columns]
+
+    # Split data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    print("RandomForestRegressor Started")
+    # Train the model
+    model = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
+
+    print("fit Started")
+    model.fit(X_train, y_train)
+    print("fit End")
+
+    # Evaluate the model
+    y_pred = model.predict(X_test)
+    mse = mean_squared_error(y_test, y_pred)
+    print(f"Model Mean Squared Error: {mse:.2f}")
+
+    # Save the model
+    dump(model, model_path)
+    print(f"Model saved to {model_path}")
+
+    return model
+
+# Step 3: Predict the Next Numbers
+def predict_next_numbers(model_path, input_features):
+    try:
+        # Load the saved model
+        model = load(model_path)
+        predictions = model.predict([input_features])
+        return predictions[0]  # Return the first prediction
+    except Exception as e:
+        print(f"Error loading model or making prediction: {e}")
+        return None
+
+# Main Function
+def main():
+    # Path to your CSV file
+    file_path = "database5373432-7754880 - complete.csv"  # Replace with your CSV file path
+    feature_columns = ["x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10","x11", "x12", "x13", "x14", "x15", "x16", "x17", "x18", "x19", "x20","x21", "x22", "x23", "x24", "x25", "x26", "x27", "x28", "x29", "x30","x31", "x32", "x33", "x34", "x35", "x36", "x37", "x38", "x39", "x40","x41", "x42", "x43", "x44", "x45", "x46", "x47", "x48", "x49", "x50","x51", "x52", "x53", "x54", "x55", "x56", "x57", "x58", "x59", "x60","x61", "x62", "x63", "x64", "x65", "x66", "x67", "x68", "x69", "x70","x71", "x72", "x73", "x74", "x75", "x76", "x77", "x78", "x79", "x80",]  # Replace with your feature column names
+    target_columns = ["y1", "y2", "y3", "y4", "y5", "y6", "y7", "y8", "y9", "y10"]  # Replace with your target column names
+
+    # Load the dataset
+    data = load_dataset(file_path)
+    if data is None:
+        return
+
+    # Train the model
+    model_path = "next_numbers_model.joblib"
+    train_model(data, feature_columns, target_columns, model_path)
+
+    # Example Prediction
+    # input_features = [5, 6, 7]  # Replace with new input features
+    # next_numbers = predict_next_numbers(model_path, input_features)
+    # print(f"Predicted next numbers: {next_numbers}")
+
+# Run the script
+if __name__ == "__main__":
+    main()
